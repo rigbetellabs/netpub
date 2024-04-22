@@ -1,4 +1,4 @@
-use serde_json::{json, Value};
+use serde_json::{json};
 use std::error::Error;
 use std::process::Stdio;
 use std::process::{Command, Output};
@@ -105,17 +105,17 @@ fn which_type_on() -> Result<String, Box<dyn Error>> {
 }
 
 fn get_json_str() -> Result<String, Box<dyn Error>> {
-    let some_ip_address_output: Output = Command::new("robonet-getip")
+    let _some_ip_address_output: Output = Command::new("robonet-getip")
         .stderr(Stdio::null())
         .output()?;
 
     let some_ip_address_str = String::from("192.168.0.178");
-    let some_ip_address = some_ip_address_str.trim();
+    let _some_ip_address = some_ip_address_str.trim();
 
     let mut network_status = 0; // Default network status: no connection
     let mut type_of_network = String::new();
 
-    let mut fetch_ip_address = String::new();
+    let _fetch_ip_address = String::new();
     let mut ip_address = String::new();
     let mut internal_ip_address = String::new();
 
@@ -203,7 +203,7 @@ fn main() {
         chatter_pub.send(msg).unwrap();
 
         if count > 10 {
-            let json_msg = get_json_str().unwrap();
+            let _json_msg = get_json_str().unwrap();
             count = 0;
         }
 
