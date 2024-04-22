@@ -2,6 +2,7 @@ use serde_json::{json, Value};
 use std::error::Error;
 use std::process::Stdio;
 use std::process::{Command, Output};
+use regex::Regex;
 
 fn center_ip_address(ip_address: &str, total_width: usize) -> String {
     let ip_length = ip_address.len();
@@ -15,17 +16,30 @@ fn center_ip_address(ip_address: &str, total_width: usize) -> String {
 }
 
 fn grep_ssid() -> Result<String, Box<dyn Error>> {
-    let output = Command::new("iwgetid").output()?;
+    // Call the command `iw dev`
+    let output = Command::new("iw")
+        .arg("dev")
+        .output()?;
+    
+    // Convert the output to a string
+    let output_str = String::from_utf8_lossy(&output.stdout);
 
-    let stdout = String::from_utf8(output.stdout)?;
+    // Regular expression pattern to match the line containing the SSID
+    let ssid_pattern = r"\bssid\s(.+)\b";
 
-    let essid = stdout
-        .split("ESSID:\"")
-        .nth(1)
-        .and_then(|s| s.split("\"").next())
-        .unwrap_or("");
+    // Compile the regex pattern
+    let re = Regex::new(ssid_pattern)?;
 
-    Ok(essid.to_string())
+    // Search for the SSID pattern in the output
+    if let Some(cap) = re.captures(&output_str) {
+        // Extract and return the SSID
+        if let Some(ssid) = cap.get(1) {
+            return Ok(ssid.as_str().trim().to_string());
+        }
+    }
+    return Ok(String::from("FETCHING-IP"));
+
+    Err("SSID not found".into())
 }
 
 fn interface_name() -> Option<String> {
@@ -111,7 +125,7 @@ fn get_json_str() -> Result<String, Box<dyn Error>> {
         .output()?;
     let some_ip_address_str = String::from_utf8_lossy(&some_ip_address_output.stdout);
     let some_ip_address = some_ip_address_str.trim();
-    println!("{}", some_ip_address);
+    //println!("{}", some_ip_address);
 
     match which_type_on() {
         Ok(network_type) => {
@@ -182,6 +196,7 @@ fn main() {
         let mut msg = rosrust_msg::std_msgs::String::default();
 
         msg.data = format!("{}", json_msg);
+        println!("{}",json_msg);
 
         // Send string message to topic via publisher
         chatter_pub.send(msg).unwrap();

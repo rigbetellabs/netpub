@@ -757,6 +757,7 @@ name = "netpub"
 version = "0.1.0"
 dependencies = [
  "env_logger",
+ "regex 1.10.4",
  "rosrust",
  "rosrust_msg",
  "serde",
