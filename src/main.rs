@@ -42,6 +42,7 @@ fn grep_ssid() -> Result<String, Box<dyn Error>> {
     Err("SSID not found".into())
 }
 
+#[allow(dead_code)]
 fn interface_name() -> Option<String> {
     match Command::new("sudo")
         .args(&["nmcli", "device", "status"])
